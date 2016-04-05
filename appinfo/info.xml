@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<info>
+	<id>cache_cleaner</id>
+	<name>Periodic chunk cache cleaner</name>
+	<description>This application periodically cleans
+	stray upload chunks from user's cache directory.
+	</description>
+	<licence>AGPL</licence>
+	<author>Miroslav Bauer @ CESNET</author>
+	<version>0.0.1</version>
+	<namespace>Cache_Cleaner</namespace>
+	<category>other</category>
+	<dependencies>
+		<owncloud min-version="8.2" />
+	</dependencies>
+</info>
