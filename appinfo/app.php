@@ -13,7 +13,4 @@ namespace OCA\Cache_Cleaner\AppInfo;
 
 use OCP\AppFramework\App;
 
-// Initialize application container
 $app = new Application();
-$c = $app->getContainer();
-

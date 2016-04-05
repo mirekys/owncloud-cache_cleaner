@@ -12,7 +12,6 @@
 namespace OCA\Cache_Cleaner\AppInfo;
 
 use OCP\AppFramework\App;
-use OC\AppFramework\Utility\TimeFactory;
 
 class Application extends App {
 	public function __construct (array $urlParams = array()) {

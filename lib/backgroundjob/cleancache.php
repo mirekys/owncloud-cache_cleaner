@@ -11,9 +11,6 @@
 
 namespace OCA\Cache_Cleaner\BackgroundJob;
 
-use OC\Files\Filesystem;
-use OC\Files\View;
-
 use OCP\IConfig;
 use OCP\ILogger;
 use OCP\IUserManager;
@@ -46,7 +43,6 @@ class CleanCache extends \OC\BackgroundJob\TimedJob {
 		$this->userManager = $userManager? $userManager : \OC::$server->getUserManager();
 		$this->logCtx = array('app' => $this->appName);
 
-		// Clean cache every 15 min (by default)
 		$this->setInterval(
 			$this->config->getSystemValue('chunkgc.period', 60*15));
 	}
@@ -67,7 +63,7 @@ class CleanCache extends \OC\BackgroundJob\TimedJob {
 
 		$users = $this->userManager->search('', $batch, $offset);
 		if (count($users) !== $batch) {
-			// Reached the end of userlist, start from 0
+			// Reached the end of userlist, continue from 0
 			$offset = 0;
 			$usersFromStart =
 				$this->userManager->search(
