@@ -57,23 +57,25 @@ class CleanCache extends \OC\BackgroundJob\TimedJob {
 		$batch = $this->config->getSystemValue('chunkgc.userlimit', 100);
 		$timeLimit = $this->config->getSystemValue('chunkgc.timelimit', 60);
 		$timeStart = time();
+		$offsetEnd = -1;
 		$countDone = 0;
-		$this->logger->info(
+
+		$this->logger->debug(
 			'Chunk GC started [offset='.$offset.']', $this->logCtx);
 
 		$users = $this->userManager->search('', $batch, $offset);
-		if (count($users) !== $batch) {
+		if (count($users) < $batch) {
 			// Reached the end of userlist, continue from 0
-			$offset = 0;
-			$usersFromStart =
-				$this->userManager->search(
-					'', $batch - count($users), $offset);
+			$offsetEnd = $offset + count($users);
+			$usersFromStart = $this->userManager->search(
+						'', $batch - count($users), 0);
 			$users = array_merge($users, $usersFromStart);
 		}
 
 		foreach ($users as $user) {
 			if (time() > ($timeLimit + $timeStart)) { break; }
-			$offset += 1;
+			$offset = $offset === $offsetEnd ? 0 : ($offset + 1);
+			$countDone++;
 			$uid = $user->getUID();
 			\OC_Util::tearDownFS();
 			if (!\OC_Util::setupFS($uid)) {
@@ -88,7 +90,6 @@ class CleanCache extends \OC\BackgroundJob\TimedJob {
 					$this->logCtx);
 				$gc = new ChunkGc();
 				$gc->gc($uid);
-				$countDone++;
 			} catch (\Exception $e) {
 				$this->logger->warning(
 					'Exception when running '
@@ -98,7 +99,6 @@ class CleanCache extends \OC\BackgroundJob\TimedJob {
 			}
 			\OC_Util::tearDownFS();
 		}
-
 		$this->config->setAppValue($this->appName, 'offset', $offset);
 		$this->logger->info('Chunk GC finished [offset='.$offset.']'
 			.' Processed ' . $countDone . ' users.', $this->logCtx);
